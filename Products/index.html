@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CraftZones — Shop Ranks</title>
+  <style>
+    /* Reset & Base */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-family:'Segoe UI', Tahoma,sans-serif;font-size:16px;color:#333;}
+    body{background:#f4f4f4;}
+    a, button{font-family:inherit;}
+
+    /* Container */
+    .container{width:min(90%,1200px);margin:0 auto;padding:2rem 0;}
+
+    /* Header */
+    header{background:#2c3e50;}
+    .nav-container{display:flex;justify-content:space-between;align-items:center;padding:1rem;}
+    .logo{color:#ecf0f1;font-size:1.5rem;font-weight:700;text-decoration:none;}
+    nav a{color:#ecf0f1;margin-left:1rem;font-weight:600;text-decoration:none;}
+
+    /* Grid */
+    .grid{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+
+    /* Badges */
+    .badge{position:absolute;top:10px;left:10px;background:#e74c3c;color:#fff;padding:.25rem .5rem;font-size:.75rem;border-radius:.25rem;}
+    .badge.discount{background:#3498db;left:auto;right:10px;}
+
+    /* Product Card */
+    .product-card{position:relative;background:#fff;border-radius:.75rem;box-shadow:0 2px 6px rgba(0,0,0,0.1);overflow:hidden;transition:transform .3s;}
+    .product-card:hover{transform:translateY(-5px);}
+    .product-card img{width:100%;display:block;}
+    .info{padding:1rem;}
+    .info h3{font-size:1.125rem;margin-bottom:.5rem;}
+    .info p{font-size:.9rem;color:#666;margin-bottom:1rem;}
+    .btn{background:#2ecc71;color:#fff;padding:.5rem 1rem;border:none;border-radius:.5rem;cursor:pointer;font-weight:600;position:relative;overflow:hidden;transition:background .3s;}
+    .btn:hover{background:#27ae60;}
+
+    /* Fly Animation */
+    @keyframes fly{to{transform:translate(var(--tx),var(--ty)) scale(.2);opacity:.5;}}
+    .fly-img{position:fixed;width:80px;pointer-events:none;z-index:1000;animation:fly .8s forwards;}
+
+    /* Cart Card */
+    #cart-card{position:fixed;bottom:20px;right:20px;width:300px;background:#fff;border-radius:.75rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:1rem;z-index:999;}
+    #cart-card h3{font-size:1.25rem;margin-bottom:.75rem;}
+    #cart-items{max-height:200px;overflow-y:auto;margin-bottom:.75rem;}
+    .cart-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;}
+    .cart-item span{font-size:.9rem;}
+    .cart-item .qty{margin:0 .5rem;}
+    .cart-item button{background:none;border:none;font-size:1.1rem;color:#e74c3c;cursor:pointer;}
+    #cart-total{text-align:center;font-weight:bold;margin-bottom:.75rem;}
+    #checkout-btn{background:#e67e22;color:#fff;width:100%;padding:.5rem;border:none;border-radius:.5rem;cursor:pointer;}
+    #checkout-btn:hover{background:#d35400;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav-container">
+      <a href="../home/index.html" class="logo">CraftZones</a>
+      <nav><a href="../home/index.html">Home</a><a href="index.html">Shop Ranks</a><a href="../comments/index.html">Comments</a></nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid" id="products-grid"></div>
+    <div id="cart-card">
+      <h3>Your Cart</h3>
+      <div id="cart-items"></div>
+      <div id="cart-total">Total: €<span id="total-amount">0</span></div>
+      <button id="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </main>
+
+  <script>
+    const products = [
+      { id:'Silver', name:'Silver Rank', img:'rank1.jpg', price:5, sold:parseInt(localStorage.getItem('sold_Silver'))||0 },
+      { id:'Gold',   name:'Gold Rank',   img:'rank2.jpg', price:10, sold:parseInt(localStorage.getItem('sold_Gold'))||0, discount:0.1 },
+      { id:'Diamond',name:'Diamond Rank',img:'rank3.jpg', price:20, sold:parseInt(localStorage.getItem('sold_Diamond'))||0 }
+    ];
+
+    function renderProducts(){
+      document.getElementById('products-grid').innerHTML = products.map(p=>{
+        const isPop = p.sold>=5?'<span class="badge">Popular</span>':'';
+        const disc  = p.discount?`<span class="badge discount">${Math.round(p.discount*100)}% Off</span>`:'';
+        const price = p.discount?(p.price*(1-p.discount)).toFixed(2):p.price.toFixed(2);
+        return `
+          <div class="product-card">
+            ${isPop}${disc}
+            <img src="../images/${p.img}" alt="${p.name}">
+            <div class="info">
+              <h3>${p.name}</h3>
+              <p>${p.sold} sold</p>
+              <p>€${price}</p>
+              <button class="btn" onclick="addToCart(this,'${p.id}',${p.price},${p.discount||0})">Add to Cart</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function updateCartCard(){
+      const cart=JSON.parse(localStorage.getItem('cart'))||[];
+      const itemsEl=document.getElementById('cart-items');
+      const totalEl=document.getElementById('total-amount');
+      itemsEl.innerHTML='';let tot=0;
+      cart.forEach((it,idx)=>{
+        const div=document.createElement('div');
+        div.className='cart-item';
+        div.innerHTML=`
+          <span>${it.name}</span>
+          <div>
+            <button onclick="changeQty(${idx},-1)">-</button>
+            <span class="qty">${it.qty}</span>
+            <button onclick="changeQty(${idx},1)">+</button>
+            <button onclick="removeItem(${idx})">&times;</button>
+            €${(it.price*it.qty).toFixed(2)}
+          </div>`;
+        itemsEl.appendChild(div);
+        tot+=it.price*it.qty;
+      });
+      totalEl.textContent=tot.toFixed(2);
+    }
+
+    function addToCart(btn,id,price,discount){
+      localStorage.setItem('sold_'+id,(parseInt(localStorage.getItem('sold_'+id))||0)+1);
+      let cart=JSON.parse(localStorage.getItem('cart'))||[];
+      let it=cart.find(x=>x.id===id);
+      if(it) it.qty++; else cart.push({id,name:products.find(p=>p.id===id).name,price,qty:1});
+      localStorage.setItem('cart',JSON.stringify(cart));
+      renderProducts(); animateFly(btn); updateCartCard();
+    }
+
+    function changeQty(i,d){
+      let cart=JSON.parse(localStorage.getItem('cart'));
+      cart[i].qty+=d;
+      if(cart[i].qty<1) cart.splice(i,1);
+      localStorage.setItem('cart',JSON.stringify(cart)); updateCartCard();
+    }
+    function removeItem(i){
+      let cart=JSON.parse(localStorage.getItem('cart'));
+      cart.splice(i,1);
+      localStorage.setItem('cart',JSON.stringify(cart)); updateCartCard();
+    }
+
+    function animateFly(btn){
+      const img=btn.closest('.product-card').querySelector('img').cloneNode();
+      document.body.appendChild(img);
+      const r1=btn.closest('.product-card').querySelector('img').getBoundingClientRect();
+      img.style.position='fixed';img.style.left=r1.left+'px';img.style.top=r1.top+'px';
+      img.className='fly-img';
+      const r2=document.getElementById('cart-card').getBoundingClientRect();
+      img.style.setProperty('--tx',r2.left-r1.left+'px');
+      img.style.setProperty('--ty',r2.top-r1.top+'px');
+      setTimeout(()=>img.remove(),800);
+    }
+
+    window.onload = ()=>{ renderProducts(); updateCartCard(); };
+  </script>
+</body>
+</html>
