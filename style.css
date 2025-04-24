@@ -1,0 +1,89 @@
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+  color: #333;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.container {
+  width: min(90%, 1200px);
+  margin-inline: auto;
+}
+
+/* Header */
+.site-header {
+  background: #2c3e50;
+  padding-block: 1rem;
+  color: #ecf0f1;
+}
+.site-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.site-header .logo img {
+  display: block;
+}
+.site-nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+.site-nav a {
+  color: #ecf0f1;
+  font-weight: bold;
+}
+.site-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Hero */
+.hero {
+  background: url('../images/hero-bg.jpg') center/cover no-repeat;
+  padding-block: 4rem;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+}
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.hero p {
+  font-size: 1.125rem;
+  margin-bottom: 1.5rem;
+}
+.btn {
+  display: inline-block;
+  background: #27ae60;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+.btn:hover {
+  background: #219150;
+  cursor: pointer;
+}
+
+/* Footer */
+.site-footer {
+  background: #ecf0f1;
+  padding-block: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #7f8c8d;
+  margin-top: 2rem;
+}
