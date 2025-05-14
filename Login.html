@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Medewerker Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('../Images/adventue.jpg') no-repeat center center/cover;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #ff5555;
+      width: 300px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+    }
+    button {
+      background: #ff5555;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background: #ff2222;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>Medewerker Login</h1>
+    <input type="text" id="username" placeholder="Gebruikersnaam" required>
+    <input type="password" id="password" placeholder="Wachtwoord" required>
+    <button onclick="login()">Login</button>
+    <p id="error-message" class="error"></p>
+  </div>
+
+  <script>
+    const medewerkers = {
+      "Maas": "Maas3914!"
+    };
+
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("error-message");
+
+      if (medewerkers[username] && medewerkers[username] === password) {
+        sessionStorage.setItem("medewerkerNaam", username);
+        window.location.href = "dashboard.html";
+      } else {
+        errorMsg.textContent = "Ongeldige inloggegevens.";
+      }
+    }
+  </script>
+</body>
+</html>

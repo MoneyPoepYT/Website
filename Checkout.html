@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Afrekenen - CraftZones</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      color: #e0e0e0;
+      background: url('../Images/adventue.jpg') no-repeat center center/cover;
+    }
+    header {
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 2px solid #ff5555;
+    }
+    header img {
+      height: 50px;
+    }
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #f0f0f0;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      color: #ff5555;
+    }
+    .checkout-container {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      max-width: 500px;
+      margin: 50px auto;
+      border-radius: 15px;
+      color: #fff;
+      box-shadow: 0 0 10px #ff5555;
+    }
+    .checkout-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .checkout-container form div {
+      margin-bottom: 10px;
+    }
+    .checkout-container input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ff5555;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+    }
+    .checkout-container button {
+      width: 100%;
+      background: #ff5555;
+      color: white;
+      padding: 12px;
+      border: none;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    .checkout-container button:hover {
+      background: #ff2222;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../Images/Logo.png" alt="CraftZones Logo">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#" onclick="toonServerMelding()">Server</a>
+      <a href="../products.html">Producten</a>
+      <a href="https://discord.gg/hAs5RRJ9J4" target="_blank">Discord</a>
+      <a href="../Login.html">Medewerker Login</a>
+    </nav>
+  </header>
+
+  <div class="checkout-container">
+    <h2>Afrekenen</h2>
+    <form id="checkout-form">
+      <div>
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" required>
+      </div>
+      <div>
+        <label for="discord-name">Discord Naam:</label>
+        <input type="text" id="discord-name" required>
+      </div>
+      <div>
+        <label for="minecraft-name">Minecraft Naam:</label>
+        <input type="text" id="minecraft-name" required>
+      </div>
+      <div>
+        <label for="phone-number">Telefoon Nummer:</label>
+        <input type="tel" id="phone-number" value="+31" required>
+      </div>
+      <input type="hidden" id="rank">
+      <button type="submit">Bestelling Plaatsen</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('checkout-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const selectedRank = localStorage.getItem("selectedRank") || "Silver Rank";
+      document.getElementById("rank").value = selectedRank;
+
+      const order = {
+        email: document.getElementById('email').value,
+        discordName: document.getElementById('discord-name').value,
+        minecraftName: document.getElementById('minecraft-name').value,
+        phoneNumber: document.getElementById('phone-number').value,
+        rank: selectedRank,
+        claimedBy: null
+      };
+
+      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      orders.push(order);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      localStorage.removeItem("selectedRank");
+
+      alert('Bedankt voor je bestelling!');
+      window.location.href = "../producten/index.html";
+    });
+  </script>
+</body>
+</html>
