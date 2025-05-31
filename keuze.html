@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Keuze - Craft Zones</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
+  a { display: inline-block; margin: 1rem; padding: 1rem 2rem; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+  a:hover { background: #45a049; }
+</style>
+</head>
+<body>
+<h1>Welkom bij Craft Zones</h1>
+<p>Kies een optie:</p>
+<a href="kassa/kassa.html">Kassa</a>
+<a href="scan/scan.html">Scan</a>
+<a href="barcode/barcode.html">Barcodes beheren</a>
+
+<script>
+  if(sessionStorage.getItem("loggedIn") !== "true"){
+    window.location.href = "../login.html";
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kassa - Craft Zones</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #fffef9; padding: 20px; }
+  h1 { color: #4caf50; text-align: center; }
+  nav { margin-bottom: 20px; text-align: center; }
+  nav a { color: #4caf50; text-decoration: none; margin: 0 10px; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+  th { background: #4caf50; color: white; }
+  #total { margin-top: 15px; font-weight: bold; font-size: 1.2rem; }
+  button { padding: 10px 20px; margin-top: 20px; background: #4caf50; color: white; border: none; cursor: pointer; border-radius: 6px; }
+  button:hover { background: #45a049; }
+</style>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAL0EjjGlt-Md4Nx6aVxNlw6N90DPHFPc0",
+    authDomain: "kassa-b0dc6.firebaseapp.com",
+    projectId: "kassa-b0dc6",
+    storageBucket: "kassa-b0dc6.appspot.com",
+    messagingSenderId: "729594183137",
+    appId: "1:729594183137:web:89d5738abe33f090d226a0",
+    measurementId: "G-0YJPL78D3J"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.onload = () => {
+    if(sessionStorage.getItem('loggedIn') !== 'true') {
+      alert("Je moet ingelogd zijn!");
+      window.location.href = '../login.html';
+      return;
+    }
+
+    const inputBarcode = document.getElementById('barcodeInput');
+    const addButton = document.getElementById('addProduct');
+    const tbody = document.getElementById('productList');
+    const totalSpan = document.getElementById('totalPrice');
+
+    let totaal = 0;
+    let producten = [];
+
+    function updateTotaal() {
+      totaal = producten.reduce((acc, p) => {
+        const korting = p.korting || 0;
+        const prijsNaKorting = p.prijs * (1 - korting / 100);
+        return acc + prijsNaKorting;
+      }, 0);
+      totalSpan.textContent = `€${totaal.toFixed(2)}`;
+    }
+
+    async function voegProductToe(barcode) {
+      try {
+        const docSnap = await getDoc(doc(db, "barcodes", barcode));
+        if(docSnap.exists()) {
+          const data = docSnap.data();
+          producten.push({
+            barcode,
+            naam: data.naam,
+            prijs: data.prijs,
+            korting: data.korting || 0
+          });
+          const tr = document.createElement('tr');
+          const kortingStr = data.korting ? data.korting + '%' : '0%';
+          tr.innerHTML = `
+            <td>${barcode}</td>
+            <td>${data.naam}</td>
+            <td>€${data.prijs.toFixed(2)}</td>
+            <td>${kortingStr}</td>
+            <td>€${(data.prijs * (1 - (data.korting||0)/100)).toFixed(2)}</td>
+          `;
+          tbody.appendChild(tr);
+          updateTotaal();
+          inputBarcode.value = "";
+          inputBarcode.focus();
+        } else {
+          alert("Barcode niet gevonden.");
+        }
+      } catch (err) {
+        alert("Fout bij ophalen product: " + err.message);
+      }
+    }
+
+    addButton.onclick = () => {
+      const barcode = inputBarcode.value.trim();
+      if(barcode) {
+        voegProductToe(barcode);
+      }
+    };
+
+    // Enter key toevoegen
+    inputBarcode.addEventListener('keydown', e => {
+      if(e.key === 'Enter') {
+        e.preventDefault();
+        addButton.click();
+      }
+    });
+  };
+</script>
+</head>
+<body>
+<nav>
+  <a href="../index.html">Home</a> | 
+  <a href="../keuze.html">Functie kiezen</a> | 
+  <a href="../login.html" onclick="sessionStorage.removeItem('loggedIn');">Uitloggen</a>
+</nav>
+<h1>Kassa</h1>
+
+<label for="barcodeInput">Voer barcode in:</label>
+<input type="text" id="barcodeInput" pattern="\d+" placeholder="Barcode" autofocus />
+<button id="addProduct">Product toevoegen</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Barcode</th>
+      <th>Productnaam</th>
+      <th>Prijs</th>
+      <th>Korting</th>
+      <th>Prijs na korting</th>
+    </tr>
+  </thead>
+  <tbody id="productList"></tbody>
+</table>
+
+<div id="total">Totaal: <span id="totalPrice">€0.00</span></div>
+</body>
+</html>

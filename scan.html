@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode Scanner - Craft Zones</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fffef9;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #4CAF50;
+    }
+    #reader {
+      width: 300px;
+      margin: 0 auto;
+    }
+    #scanResult {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scan een barcode</h1>
+  <div id="reader"></div>
+  <div id="scanResult">Nog niets gescand.</div>
+
+  <script>
+    window.onload = () => {
+      const scanner = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: { width: 250, height: 100 } };
+
+      scanner.start(
+        { facingMode: "environment" },
+        config,
+        async (barcode) => {
+          document.getElementById("reader").style.display = "none";
+
+          const barcodes = JSON.parse(localStorage.getItem("barcodes")) || [];
+          const item = barcodes.find(b => b.code === barcode);
+
+          if (item) {
+            document.getElementById("scanResult").innerHTML = `✅ <strong>${item.naam}</strong><br>Prijs: €${item.prijs}<br>Korting: ${item.korting || 0}%`;
+            // Eventueel: voeg toe aan bon, winkelwagen etc.
+          } else {
+            document.getElementById("scanResult").textContent = "❌ Barcode niet gevonden.";
+          }
+        },
+        (err) => {
+          console.warn(err);
+        }
+      );
+    }
+  </script>
+</body>
+</html>
