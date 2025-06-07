@@ -388,7 +388,7 @@
     if (!text || !currentChatId) return;
 
     // Check credits before sending (1 credit per message)
-    let credits = parseInt(localStorage.getItem(CREDITS_KEY) || '0', 10);
+    let credits = parseInt(localStorage.getItem(CREDITS_KEY) || '10', 10);
     if (credits < 1) {
       alert('Je hebt geen credits meer. Koop er meer in je account.');
       return;
