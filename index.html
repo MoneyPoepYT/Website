@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QANWAS Uncopylocked Hub</title>
+  <style>
+    :root {
+      font-family: 'Poppins', system-ui, sans-serif;
+      --primary: #2563eb;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      animation: fadeIn 1s ease-in-out;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    header img {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #1d4ed8;
+      padding: 6px;
+      animation: pulse 3s infinite ease-in-out;
+    }
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      background: linear-gradient(90deg, #60a5fa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.25);
+      animation: slideUp 0.6s ease-in-out;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    a.game {
+      text-decoration: none;
+      color: var(--text);
+      background: #1e3a8a;
+      border-radius: 14px;
+      padding: 18px;
+      display: block;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transform: scale(1);
+      transition: transform .2s, box-shadow .2s;
+    }
+    a.game:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(59,130,246,0.5);
+    }
+    .title { font-weight: 600; font-size: 18px; }
+    .meta { font-size: 13px; color: #cbd5e1; margin-top: 6px; }
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      color: white;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: transform .2s ease, box-shadow .2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(147,51,234,0.4);
+    }
+    .hidden { display: none; }
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .modal {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(59,130,246,0.4);
+      animation: popIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .8; transform: scale(1.1); }
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="LOGO.png" alt="Logo">
+      <div>
+        <h1>QANWAS Uncopylocked Hub</h1>
+        <p style="color:#cbd5e1;margin:0;">Free uncopylocked Roblox experiences — explore & download!</p>
+      </div>
+    </header>
+
+    <main id="app">
+      <section id="index-view" class="card">
+        <h2>Available Games</h2>
+        <div id="games-list" class="grid"></div>
+      </section>
+
+      <section id="game-view" class="card hidden">
+        <a id="back-link" href="#/" style="color:#60a5fa;">← Back</a>
+        <h2 id="game-title"></h2>
+        <p id="game-desc" class="meta"></p>
+        <div style="margin-top:18px;">
+          <button id="subscribe-btn" class="btn">Subscribe on YouTube</button>
+          <p id="gate-meta" class="meta">Subscribe to unlock the download.</p>
+          <a id="download-link" class="btn hidden" download>Download .rbxl</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2025 QANWAS Uncopylocked Hub — Created for the Roblox community</footer>
+  </div>
+
+  <template id="modal-template">
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h3>Verifying Subscription...</h3>
+        <p>Please wait while we confirm your subscription.</p>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    const GAMES = [
+      {id: 4736519861, slug: 'PLS-DONATE-MODDED', title: 'PLS Donate Modded', desc: 'A modded version of PLS Donate with custom features.', file: 'PLS DONATE MODDED UNCOPYLOCKED BY QANWASUNCOPLOCKEDS.rbxl'},
+    ];
+
+    const $ = s => document.querySelector(s);
+    const indexView = $('#index-view');
+    const gameView = $('#game-view');
+
+    function renderIndex() {
+      indexView.classList.remove('hidden');
+      gameView.classList.add('hidden');
+      const list = $('#games-list');
+      list.innerHTML = '';
+      GAMES.forEach(g => {
+        const link = document.createElement('a');
+        link.className = 'game';
+        link.href = `#/game/${g.id}/${g.slug}`;
+        link.innerHTML = `<div class='title'>${g.title}</div><div class='meta'>${g.desc}</div>`;
+        list.appendChild(link);
+      });
+    }
+
+    function renderGame(id) {
+      const g = GAMES.find(x => String(x.id) === id);
+      if (!g) return location.hash = '#/';
+      indexView.classList.add('hidden');
+      gameView.classList.remove('hidden');
+      $('#game-title').textContent = g.title;
+      $('#game-desc').textContent = g.desc;
+      const dl = $('#download-link');
+      dl.href = g.file;
+      dl.classList.add('hidden');
+      $('#gate-meta').textContent = 'Subscribe to unlock the download.';
+
+      $('#subscribe-btn').onclick = () => startCountdown(() => {
+        $('#gate-meta').textContent = 'Subscription verified! You can now download.';
+        dl.classList.remove('hidden');
+      });
+    }
+
+    function startCountdown(onDone) {
+      const tpl = $('#modal-template').content.cloneNode(true);
+      document.body.appendChild(tpl);
+      const modal = document.querySelector('.modal-backdrop');
+      setTimeout(() => {
+        modal.querySelector('h3').textContent = 'Subscription Verified!';
+        modal.querySelector('p').textContent = 'You may now close this window.';
+        setTimeout(() => { modal.remove(); onDone(); }, 800);
+      }, 10000);
+      modal.onclick = e => { if (e.target === modal) modal.remove(); };
+      window.open("https://www.youtube.com/@QANWAS", "_blank");
+    }
+
+    function router() {
+      const hash = location.hash || '#/';
+      const parts = hash.split('/');
+      if (parts[1] === 'game' && parts[2]) renderGame(parts[2]);
+      else renderIndex();
+    }
+    window.addEventListener('hashchange', router);
+    router();
+  </script>
+</body>
+</html>
